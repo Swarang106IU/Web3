@@ -26,7 +26,7 @@ result="You win!";
 result="You Lose!";
 document.getElementById("result").InnerText=
 'You chose${userChoice}, Computer chose $
-{computerChoice}.$({result}';
+{computerChoice}.${result}';
 }
 </script>
 </body>
