@@ -1,6 +1,7 @@
 <html>
 <title>Temperature Converter</title>
 <h1>Celcius To Fahrenhiet</h1>
+<script>
 function CToF(C) {
   return (C * 9/5) + 32;
 }
@@ -8,4 +9,5 @@ function CToF(C) {
 let C = parseFloat(prompt("Enter temperature in C:"));
 let F = CToF(C);
 alert(c + "°C is equal to " + F + "°F");
+</script>
 </html>
