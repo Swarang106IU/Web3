@@ -1,0 +1,178 @@
+<html>
+<head>
+<title>Shopping cart</title>
+</head>
+<body>
+ <style> 
+body { 
+font-family: Arial, sans-serif; 
+text-align: center; 
+background-color: aliceblue; 
+} 
+h1 { 
+color: blue; 
+} 
+.item { 
+background-color: #ffa07a; 
+border: 2px solid #333; 
+padding: 10px; 
+margin: 10px; 
+display: inline-block; 
+} 
+.cart { 
+margin-top: 20px; 
+padding: 10px; 
+background-color: #aaf0d1; 
+display: inline-block; 
+border-radius: 10px; 
+} 
+</style> 
+</head> 
+<body> 
+ 
+<h1>Welcome to Sports Shop!</h1> 
+<p>Click the button to add an item to the cart.</p> 
+<div class="item"> 
+  <p>
+ 🏀Basketball - ₹700</p> 
+<button onclick="addToCart('Basketball',700)">Add to Cart</button> 
+</div> 
+   
+
+
+<div class="item"> 
+   <p>
+ ⚽ Football(Nivia) - ₹900</p> 
+<button onclick="addToCart('Football',900)">Add to Cart</button> 
+</div>
+
+
+ 
+<div class="item">
+  <p>
+  🥎 Tennis Ball- ₹60</p> 
+<button onclick="addToCart('Tennis Ball',60)">Add to Cart</button> 
+</div> 
+
+
+<div class="item">
+  <p>
+ 🏏Cricket Bat- ₹1500</p> 
+<button onclick="addToCart('Cricket Bat',1500)">Add to Cart</button> 
+</div>
+
+
+<div class="item">
+  <p>
+ ⚾Leather Ball - ₹350</p> 
+<button onclick="addToCart('Leather Ball',350)">Add to Cart</button> 
+</div>
+
+
+
+
+<div class="item">
+  <p>
+ 🏸Badminton Kit - ₹1280</p> 
+<button onclick="addToCart('Badminton kit',1280)">Add to Cart</button> 
+</div>
+
+
+
+<div class="item">
+  <p>
+ 🎾Tennis Kit - ₹1200</p> 
+<button onclick="addToCart('Tennis Kit',1200)">Add to Cart</button> 
+</div>
+
+
+
+<div class="item">
+  <p>
+🏐Volleyball  - ₹400</p> 
+<button onclick="addToCart('Volleyball',400)">Add to Cart</button> 
+</div>
+
+
+
+<div class="item">
+  <p>
+  \|/Stumps- ₹200</p> 
+<button onclick="addToCart('Stumps',450)">Add to Cart</button> 
+</div>
+
+
+
+<div class="item">
+  <p>
+ 👟Running Shoes - ₹2500</p> 
+<button onclick="addToCart('Running Shoes',2500)">Add to Cart</button> 
+</div>
+
+
+
+
+<div class="item">
+  <p>
+ ⛹ Basketball Kit- ₹2000</p> 
+<button onclick="addToCart('Basketball kit',2000)">Add to Cart</button> 
+</div>
+
+
+
+<div class="item">
+  <p>
+ 🏂Ice Skating Kit - ₹5750</p> 
+<button onclick="addToCart('Ice Skating Kit',5750 )">Add to Cart</button> 
+</div>
+
+
+
+<div class="item">
+  <p>
+ 🥊Boxing Gloves - ₹750</p> 
+<button onclick="addToCart('Boxing Gloves',750)">Add to Cart</button> 
+</div>
+
+
+
+<div class="item">
+  <p>
+ 🏌️⛳Golf kit - ₹4500</p> 
+<button onclick="addToCart('Golf Kit',4500)">Add to Cart</button> 
+</div>
+
+
+
+<div class="item">
+  <p>
+🏓Table Tenis - ₹1650</p> 
+<button onclick="addToCart('Table tenis',1650)">Add to Cart</button> 
+</div>
+<br>
+
+
+<div class="cart">
+<h3>Shopping Cart</h3>
+<p id="cartList">Cart is empty</p>
+<h3>Total: ₹<span id="totalAmount">0</span></h3>
+</div>
+
+<script>
+let totalAmount = 0;
+function addToCart(item, price) {
+let cart = document.getElementById("cartList");
+let total = document.getElementById("totalAmount");
+// Update cart items
+if (cart.innerHTML === "Cart is empty") {
+cart.innerHTML = item;
+ } else {
+cart.innerHTML += ", " + item;
+}
+// Update total amount
+totalAmount += price;
+total.innerHTML = totalAmount;
+}
+</script>
+</body>
+</html>
