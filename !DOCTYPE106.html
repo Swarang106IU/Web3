@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Number Guessing Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --accent: #34d399;
+      --warn: #f59e0b;
+      --error: #ef4444;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(1200px 800px at 50% -200px, #1f2937, var(--bg));
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .game {
+      width: 95%;
+      max-width: 520px;
+      background: linear-gradient(180deg, #0b1220, var(--card));
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 #1f2937;
+    }
+    .game h1 {
+      margin: 0 0 8px;
+      font-size: 1.5rem;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      margin: 0 0 18px;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .range {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+    .range input {
+      width: 86px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #374151;
+      background: #0b1220;
+      color: var(--text);
+    }
+    input[type="number"] {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #374151;
+      background: #0b1220;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    input[type="number"]:focus {
+      border-color: #475569;
+    }
+    button {
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid #10b981;
+      background: linear-gradient(180deg, #10b981, #059669);
+      color: #052016;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.05s ease, filter 0.15s ease, opacity 0.2s ease;
+    }
+    button:hover { filter: brightness(1.05); }
+    button:active { transform: translateY(1px); }
+    button.secondary {
+      border-color: #374151;
+      background: #0b1220;
+      color: var(--text);
+    }
+    .stats {
+      display: flex;
+      gap: 14px;
+      margin: 12px 0 6px;
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #0b1220;
+      border: 1px solid #374151;
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+    .messages {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .msg {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      display: flex;
+      align-items: start;
+      gap: 10px;
+      line-height: 1.35;
+    }
+    .msg strong { color: var(--text); }
+    .msg.info { border-color: #374151; }
+    .msg.hint { border-color: var(--warn); }
+    .msg.error { border-color: var(--error); }
+    .msg.success { border-color: var(--accent); }
+    .footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="game" role="main" aria-label="Number guessing game">
+    <h1>Number Guessing Game</h1>
+    <p class="subtitle">Guess the secret number. Get clear messages: too high, too low, invalid, win, and game over.</p>
+
+    <div class="range" aria-label="Range settings">
+      <label>Min
+        <input id="min" type="number" value="1" />
+      </label>
+      <label>Max
+        <input id="max" type="number" value="100" />
+      </label>
+      <label>Chances
+        <input id="chances" type="number" value="10" />
+      </label>
+      <button id="apply" class="secondary" title="Apply new range">Apply</button>
+    </div>
+
+    <div class="row">
+      <input id="guess" type="number" placeholder="Enter your guess…" />
+      <button id="submit">Guess</button>
+    </div>
+
+    <div class="stats">
+      <span class="badge" id="rangeBadge">Range: 1–100</span>
+      <span class="badge" id="leftBadge">Chances left: 10</span>
+      <span class="badge" id="triesBadge">Tries: 0</span>
+    </div>
+
+    <section class="messages" id="messages" aria-live="polite">
+      <div class="msg info">
+        <strong>Tip:</strong> Start in the middle of the range to narrow quickly.
+      </div>
+    </section>
+
+    <div class="footer">
+      <button id="reset" class="secondary">Reset</button>
+      <button id="reveal" class="secondary">Reveal</button>
+    </div>
+  </main>
+
+  <script>
+    const guessInput = document.getElementById('guess');
+    const submitBtn = document.getElementById('submit');
+    const resetBtn = document.getElementById('reset');
+    const revealBtn = document.getElementById('reveal');
+    const messages = document.getElementById('messages');
+
+    const minInput = document.getElementById('min');
+    const maxInput = document.getElementById('max');
+    const chancesInput = document.getElementById('chances');
+    const applyBtn = document.getElementById('apply');
+
+    const rangeBadge = document.getElementById('rangeBadge');
+    const leftBadge = document.getElementById('leftBadge');
+    const triesBadge = document.getElementById('triesBadge');
+
+    let secret = 0;
+    let min = 1;
+    let max = 100;
+    let chances = 10;
+    let left = chances;
+    let tries = 0;
+    let ended = false;
+
+    function randInt(a, b) {
+      return Math.floor(Math.random() * (b - a + 1)) + a;
+    }
+
+    function setSecret() {
+      secret = randInt(min, max);
+    }
+
+    function setBadges() {
+      rangeBadge.textContent = `Range: ${min}–${max}`;
+      leftBadge.textContent = `Chances left: ${left}`;
+      triesBadge.textContent = `Tries: ${tries}`;
+    }
+
+    function clearMessages() {
+      messages.innerHTML = '';
+    }
+
+    function pushMsg(text, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `msg ${type}`;
+      div.innerHTML = text;
+      messages.prepend(div);
+    }
+
+    function startGame() {
+      ended = false;
+      tries = 0;
+      left = chances;
+      setSecret();
+      setBadges();
+      clearMessages();
+      pushMsg('<strong>New game:</strong> Guess the secret number!', 'info');
+      guessInput.value = '';
+      guessInput.disabled = false;
+      submitBtn.disabled = false;
+    }
+
+    function endGame(win) {
+      ended = true;
+      guessInput.disabled = true;
+      submitBtn.disabled = true;
+      if (win) {
+        pushMsg(`<strong>Correct!</strong> You guessed ${secret} in ${tries} ${tries === 1 ? 'try' : 'tries'}.`, 'success');
+      } else {
+        pushMsg(`<strong>Game over.</strong> The number was <strong>${secret}</strong>.`, 'error');
+      }
+    }
+
+    function validateRangeValues() {
+      const newMin = Number(minInput.value);
+      const newMax = Number(maxInput.value);
+      const newChances = Number(chancesInput.value);
+
+      if (!Number.isInteger(newMin) || !Number.isInteger(newMax) || !Number.isInteger(newChances)) {
+        pushMsg('<strong>Invalid:</strong> Range and chances must be integers.', 'error');
+        return null;
+      }
+      if (newMin >= newMax) {
+        pushMsg('<strong>Invalid range:</strong> Min must be less than max.', 'error');
+        return null;
+      }
+      if (newChances < 1 || newChances > 1000) {
+        pushMsg('<strong>Invalid chances:</strong> Choose between 1 and 1000.', 'error');
+        return null;
+      }
+      return { newMin, newMax, newChances };
+    }
+
+    function applyRange() {
+      const vals = validateRangeValues();
+      if (!vals) return;
+
+      min = vals.newMin;
+      max = vals.newMax;
+      chances = vals.newChances;
+      startGame();
+      pushMsg(`<strong>Range set:</strong> ${min}–${max}, ${chances} chances.`, 'info');
+    }
+
+    function handleGuess() {
+      if (ended) return;
+
+      const value = Number(guessInput.value);
+
+      if (!Number.isFinite(value)) {
+        pushMsg('<strong>Invalid:</strong> Please enter a number.', 'error');
+        return;
+      }
+      if (!Number.isInteger(value)) {
+        pushMsg('<strong>Invalid:</strong> Only whole numbers are allowed.', 'error');
+        return;
+      }
+      if (value < min || value > max) {
+        pushMsg(`<strong>Out of range:</strong> Enter between ${min} and ${max}.`, 'error');
+        return;
+      }
+
+      tries += 1;
+      left -= 1;
+      setBadges();
+
+      if (value === secret) {
+        endGame(true);
+        return;
+      }
+
+      const diff = Math.abs(value - secret);
+      const proximity =
+        diff <= Math.max(1, Math.floor((max - min) * 0.02)) ? 'Very close!' :
+        diff <= Math.max(2, Math.floor((max - min) * 0.05)) ? 'Close.' :
+        diff <= Math.max(5, Math.floor((max - min) * 0.10)) ? 'Getting warmer.' :
+        'Far off.';
+
+      if (value < secret) {
+        pushMsg(`<strong>Too low:</strong> Try higher. <em>${proximity}</em>`, 'hint');
+      } else {
+        pushMsg(`<strong>Too high:</strong> Try lower. <em>${proximity}</em>`, 'hint');
+      }
+
+      if (left <= 0) {
+        endGame(false);
+      }
+    }
+
+    // Event listeners
+    submitBtn.addEventListener('click', handleGuess);
+    guessInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleGuess();
+    });
+    resetBtn.addEventListener('click', startGame);
+    revealBtn.addEventListener('click', () => {
+      if (!ended) {
+        pushMsg(`<strong>Reveal:</strong> The secret is <strong>${secret}</strong>.`, 'info');
+        endGame(false);
+      }
+    });
+    applyBtn.addEventListener('click', applyRange);
+
+    // Initialize
+    startGame();
+  </script>
+</body>
+</html>
